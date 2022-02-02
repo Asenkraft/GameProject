@@ -31,8 +31,8 @@ void DisplayManager::updateDisplay(GLFWwindow* window)
 {
 	glfwSwapBuffers(window);
 	glfwPollEvents();
-
 }
+;
 
 void DisplayManager::closeDisplay()
 {

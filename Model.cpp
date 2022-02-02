@@ -663,3 +663,59 @@ float Terrain::get_Z()
 {
 	return m_Z;
 }
+
+Player::Player(Model_Textured model, glm::vec3 position, float rotX, float rotY, float rotZ, float scale)
+	:Entity(model, position, rotX, rotY, rotZ, scale)
+{
+
+}
+
+void Player::move(uint64_t Frame_Time)
+{
+	increase_Rotation(0, m_Current_Turn_Speed / Frame_Time, 0);
+	float distance = m_Current_Speed / Frame_Time;
+	float dx = distance * glm::sin(get_Rot_Y());
+	float dz = distance * glm::cos(get_Rot_Y());
+	increase_Position(dx, 0, dz);
+
+	m_UpwardSpeed += m_Gravity / Frame_Time;
+	increase_Position(0, m_UpwardSpeed / Frame_Time, 0);
+	//Terrain "Collision"
+	if (get_Position_Y() < 0)
+	{
+		m_UpwardSpeed = 0;
+		is_In_Air = false;
+	}
+}
+
+void Player::move_UP(bool isPressed)
+{
+	if (isPressed ? m_Current_Speed = m_Run_Speed : m_Current_Speed = 0);
+}
+
+void Player::move_Down(bool isPressed)
+{
+	if (isPressed ? m_Current_Speed = -m_Run_Speed : m_Current_Speed = 0);
+}
+
+void Player::move_Left(bool isPressed)
+{
+	if (isPressed ? m_Current_Turn_Speed = m_Turn_Speed : m_Current_Turn_Speed = 0);
+}
+
+
+void Player::move_Right(bool isPressed)
+{
+	if (isPressed ? m_Current_Turn_Speed = -m_Turn_Speed : m_Current_Turn_Speed = 0);
+}
+
+void Player::move_Jump(bool isPressed)
+{
+	if (!is_In_Air) 
+	{
+		m_UpwardSpeed = m_Jump_Power;
+		is_In_Air = true;
+	}
+
+}
+

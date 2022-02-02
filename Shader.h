@@ -51,8 +51,14 @@ public:
 	float getPitch();
 	float getYaw();
 	float getRoll();
-
+	Camera();
 private:
+	float m_Distance_From_Player = 50;
+	float m_Angle_Around_Player = 0;
+	void calculate_Zoom();
+
+
+
 	glm::vec3 m_position = glm::vec3(1.0f);
 	//height of camera
 	float m_pitch = 0.0f;

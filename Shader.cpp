@@ -92,6 +92,15 @@ float Camera::getRoll()
 	return m_roll;
 }
 
+Camera::Camera()
+{
+}
+
+void Camera::calculate_Zoom()
+{
+
+}
+
 
 glm::mat4 MatrixMath::create_Transformation_Matrix(glm::vec3 translation, float rot_X, float rot_Y, float rot_Z, float scale)
 {

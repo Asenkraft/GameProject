@@ -1,5 +1,7 @@
 #include "Game.h"
 
+Camera camera;
+
 void GameLoop::start()
 {
 	glfwInit();
@@ -56,11 +58,12 @@ void GameLoop::start()
 	Model_Textured textured_Model_Fern(raw_Model_Fern, textured_Fern);
 	Model_Textured textured_Model_Stall(raw_Model_Stall, textured_Stall);
 	Model_Textured textured_Model_Gras_Block(raw_Model_Block, basic_Gras_Block_Texture);
+
+	
 	
 	Entity entity_Dragon1(textured_Model_Dragon, glm::vec3(0.0f, 0.0f, -55.0f), 0.0f, 0.0f, 0.0f, 1.0f);
 	Entity entity_Dragon2(textured_Model_Dragon, glm::vec3(0.0f, 0.0f, -35.0f), 0.0f, 0.0f, 0.0f, 1.0f);
 	Entity entity_cube1(textured_Model_Cube, glm::vec3(0.0f, 0.0f, -25.0f), 0.0f, 0.0f, 0.0f, 1.0f);
-	Entity entity_Girl1(textured_Model_Girl, glm::vec3(0.0f, 0.0f, -5.0f), 0.0f, 0.0f, 0.0f, 1.0f);
 	Entity entity_Stall(textured_Model_Stall, glm::vec3(10.0f, 0.0f, -15.0f), 0.0f, 0.0f, 0.0f, 1.0f);
 
 	Entity entity_Gras_Cube1(textured_Model_Gras_Block, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, 0.0f, 0.0f, 1.0f);
@@ -77,17 +80,18 @@ void GameLoop::start()
 	Terrain terrain4 = Terrain(0, 0, loader, Texture(loader.load_Texture("res/Terrain/grass2.png")));
 
 	Light light(glm::vec3(0.0f, 500.0f, -20.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-
-	Camera camera;
-
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	Player player(textured_Model_Girl, glm::vec3(0.0f, 0.0f, -15.0f), 0.0f, 2.0f, 0.0f, 1.0f);
 	
 
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	//glfwSetScrollCallback(window, scroll_callback);
 
 	Master_Renderer renderer;
 
 	while (!glfwWindowShouldClose(window))
 	{
+		Timer timer;
+
 		renderer.processTerrain(terrain);
 		renderer.processTerrain(terrain2);
 		renderer.processTerrain(terrain3);
@@ -95,9 +99,10 @@ void GameLoop::start()
 		renderer.processEntity(entity_Dragon1);
 		renderer.processEntity(entity_Dragon2);
 		renderer.processEntity(entity_cube1);
-		renderer.processEntity(entity_Girl1);
 		renderer.processEntity(entity_Fern1);
 		renderer.processEntity(entity_Stall);
+
+	
 
 		renderer.processEntity(entity_Gras_Cube1);
 		renderer.processEntity(entity_Gras_Cube2);
@@ -105,15 +110,43 @@ void GameLoop::start()
 		renderer.processEntity(entity_Gras_Cube4);
 		renderer.processEntity(entity_Gras_Cube5);
 		renderer.processEntity(entity_Gras_Cube6);
+		
 
 		renderer.render(light, camera);
 
-		processInput(camera);
 		entity_Dragon1.increase_Rotation(0.0f, 0.0002f, 0.0f);
 		entity_Dragon2.increase_Rotation(0.0f, 0.0002f, 0.0f);
 		entity_cube1.increase_Rotation(0.0f, 0.0002f, 0.0f);
+		
+		processInput(camera, player);
 
-		DP.updateDisplay(window);
+		m_UPS++;
+		m_time_Accumulated += timer.measureTime();
+		m_time_Accumulated_To_One_Seconds += timer.measureTime();
+
+	
+
+
+		player.move(timer.measureTime());
+		renderer.processEntity(player);
+
+		if (m_time_Accumulated_To_One_Seconds >= 1000000)
+		{
+			std::cout << "(FPS|UPS) (" << m_FPS <<  "|" << m_UPS << ")\r";
+			m_time_Accumulated_To_One_Seconds = 0;
+			m_FPS = 0;
+			m_UPS = 0;
+		}
+		if (m_time_Accumulated / 1000 > frameTime)
+		{
+			m_time_Accumulated = 0;
+			m_FPS++;
+
+
+
+			DP.updateDisplay(window);
+		}
+		timer.~Timer();
 	}
 	DP.closeDisplay();
 	loader.cleanUp();
@@ -134,7 +167,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 std:printf("Viewport is changed: width: %i height: %i\r", width, height);
 }
 
-void processInput(Camera& camera)
+void processInput(Camera& camera, Player& player)
 {
 
 // TODO: KeyCallback
@@ -185,34 +218,76 @@ void processInput(Camera& camera)
 		camera.keyPressD();
 	}
 
+	//Q
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
 		camera.keyPressQ();
 	}
 
+	//E
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
 		camera.keyPressE();
 	}
 
+	//R
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
 	{
 		camera.keyPressR();
 	}
 
+	//F
 	if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
 	{
 		camera.keyPressF();
 	}
 
+	//T
 	if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
 	{
 		camera.keyPressT();
 	}
 
+	//G
 	if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
 	{
 		camera.keyPressG();
 	}
 
+
+	//Arrow Up
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		player.move_UP(true);
+	}
+	//Arrow Down
+	else  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		player.move_Down(true);
+
+	}
+	else player.move_Down(false);
+
+	//Arrow Left
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	{
+		player.move_Left(true);
+	}
+	//Arrow Right
+	else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	{
+		player.move_Right(true);
+	}
+	else player.move_Right(false);
+	//Space
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+	{
+		player.move_Jump(true);
+	}
+
+}
+
+void scroll_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	std::cout << "ypos: " << ypos << "\n";
 }

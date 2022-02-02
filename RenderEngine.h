@@ -19,13 +19,6 @@ public:
 private:
 	uint32_t m_Width = 1280;
 	uint32_t m_Height = 720;
-
-	ReturnTimer m_ReturnTimer;
-	uint64_t m_time_Accumulated = 0;
-	uint64_t m_time_Accumulated_To_One_Seconds = 0;
-	uint32_t m_FPS = 0;
-	uint32_t m_UPS = 0;
-	double frameTime = (1.0 / 144.0) * 1000;
 };
 
 //renders stuff

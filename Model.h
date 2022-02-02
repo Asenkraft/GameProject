@@ -89,7 +89,7 @@ public:
 
 	Entity(Model_Textured model, glm::vec3 position, float rot_X, float rot_Y, float rot_Z, float scale);
 
-private:
+protected:
 	Model_Textured m_Model_Textured;
 	glm::vec3 m_Position;
 	float m_Rot_X, m_Rot_Y, m_Rot_Z;
@@ -142,3 +142,30 @@ private:
 	Texture m_Texture_Terrain;
 };
 
+class Player : public Entity
+{
+public:
+	Player(Model_Textured model, glm::vec3 position, float rotX, float rotY, float rotZ, float scale);
+	void move(uint64_t Frame_Time);
+
+	//will not stop moving after pressing button
+	void move_UP(bool isPressed);
+	void move_Down(bool isPressed);
+	void move_Left(bool isPressed);
+	void move_Right(bool isPressed);
+	void move_Jump(bool isPressed);
+private:
+
+private:
+	float m_Run_Speed = 0.2f;
+	float m_Turn_Speed = 0.2f;
+
+	float m_Gravity = -0.2f;
+	float m_Jump_Power = 1.0f;
+	bool is_In_Air = false;
+
+	float m_Current_Speed = 0;
+	float m_Current_Turn_Speed = 0;
+	float m_UpwardSpeed = 0;
+
+};

@@ -32,6 +32,9 @@ public:
 	Timer();
 	void stop();
 	~Timer();
+
+	long long measureTime();
+
 private:
 	std::chrono::time_point <std::chrono::high_resolution_clock> m_StartTimepoint;
 	std::chrono::time_point <std::chrono::high_resolution_clock> m_EndTimepoint;

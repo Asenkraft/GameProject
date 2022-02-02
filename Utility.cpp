@@ -92,6 +92,22 @@ Timer::~Timer()
 
 }
 
+long long Timer::measureTime()
+{
+	//Destructor ends the timer
+	std::chrono::time_point <std::chrono::high_resolution_clock> endTimepoint = std::chrono::high_resolution_clock::now();
+	m_EndTimepoint = endTimepoint;
+	//casts the time of start and end of those timers in microseconds and saves it in long long start and long long end
+	long long start = std::chrono::time_point_cast<std::chrono::microseconds> (m_StartTimepoint).time_since_epoch().count();
+	long long end = std::chrono::time_point_cast<std::chrono::microseconds> (m_EndTimepoint).time_since_epoch().count();
+
+	//difference of end and start is the duration of the runtime/lifetime
+	long long duration = end - start;
+
+	//return duration in microseconds
+	return duration;
+}
+
 void Timer::stop()
 {
 	//Destructor ends the timer
