@@ -202,6 +202,21 @@ void Master_Renderer::disable_Culling()
 	glCullFace(GL_BACK);
 }
 
+void Master_Renderer::toggle_Wireframe(bool isPressed)
+{
+	
+	if (isPressed)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+	else
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+	
+
+}
+
 
 void Master_Renderer::prepare()
 {
@@ -209,6 +224,9 @@ void Master_Renderer::prepare()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearColor(m_Red, m_Green, m_Blue, 1.0f);
 }
+
+
+
 
 Master_Renderer::Master_Renderer()
 	:m_Projection_Matrix(create_Projection_Matrix()), m_Entity_Renderer(Entity_Renderer(m_Shader, m_Projection_Matrix)), m_Terrain_Renderer(Terrain_Renderer(m_Terrain_Shader, m_Projection_Matrix))

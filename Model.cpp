@@ -228,9 +228,9 @@ uint32_t Loader::load_Texture(std::string filePath)
 	Importer importer;
 
 	uint32_t texture_ID = importer.importTexture(filePath);
-
 	textures.push_back(texture_ID);
 	std::cout << "Texture added. Textures (list) has " << textures.size() << " element(s). Texture with ID: \"" << texture_ID << "\" has been pushed back.\n";
+
 	return texture_ID;
 }
 
@@ -599,16 +599,68 @@ Model_Raw Terrain::generateTerrain(Loader loader)
 			vertices[vertexPointer * 3] = (float)j / ((float)m_VERTEX_COUNT - 1) * m_SIZE;
 			normals[vertexPointer * 3] = 0;
 			textureCoords[vertexPointer * 2] = (float)j / ((float)m_VERTEX_COUNT - 1);
-			//Y
+			////Y
 			////Height Map through simplex function
 			//float height_Point_Value = glm::simplex(glm::vec2((float)j / ((float)m_VERTEX_COUNT - 1) * m_SIZE / 200.0f, (float)i / ((float)m_VERTEX_COUNT - 1) * m_SIZE / 200.0f) );
-			////normalize between 0 and 1
-			//height_Point_Value = (height_Point_Value + 1) / 2;
+			//
+
+
+			//// normalize between 0 and 1
+			//height_Point_Value = (height_Point_Value + 1.0f) / 2.0f;
+
+			//if (height_Point_Value >= 0.0f && height_Point_Value <= 0.09f)
+			//{
+			//	height_Point_Value = 0.0f;
+			//}
+			//else if (height_Point_Value >= 0.1f && height_Point_Value <= 0.19f)
+			//{
+			//	height_Point_Value = 0.1f;
+			//}
+			//else if (height_Point_Value >= 0.19f && height_Point_Value <= 0.29f)
+			//{
+			//	height_Point_Value = 0.2f;
+			//}
+			//else if (height_Point_Value >= 0.29f && height_Point_Value <= 0.39f)
+			//{
+			//	height_Point_Value = 0.3f;
+			//}
+			//else if (height_Point_Value >= 0.39f && height_Point_Value <= 0.49f)
+			//{
+			//	height_Point_Value = 0.4f;
+			//}
+			//else if (height_Point_Value >= 0.49f && height_Point_Value <= 0.59f)
+			//{
+			//	height_Point_Value = 0.5f;
+			//}
+			//else if (height_Point_Value >= 0.59f && height_Point_Value <= 0.69f)
+			//{
+			//	height_Point_Value = 0.6f;
+			//}
+			//else if (height_Point_Value >= 0.69f && height_Point_Value <= 0.79f)
+			//{
+			//	height_Point_Value = 0.7f;
+			//}
+			//else if (height_Point_Value >= 0.79f && height_Point_Value <= 0.89f)
+			//{
+			//	height_Point_Value = 0.8f;
+			//}
+			//else if (height_Point_Value >= 0.89f && height_Point_Value <= 0.95f)
+			//{
+			//	height_Point_Value = 0.9;
+			//}
+			//else if (height_Point_Value > 0.95f)
+			//{
+			//	height_Point_Value = 1.0f;
+			//}
+
 			//// more height!
-			//height_Point_Value = (height_Point_Value * 50) -50;
+			//float height_factor = 10.0f;
+			//height_Point_Value = (height_Point_Value * height_factor) - 5.0f;
+
 			//vertices[vertexPointer * 3 + 1] = height_Point_Value;
 
 			vertices[vertexPointer * 3 + 1] = 0;
+
 			normals[vertexPointer * 3 + 1] = 1;
 			textureCoords[vertexPointer * 2 + 1] = (float)i / ((float)m_VERTEX_COUNT - 1);
 			//Z
@@ -672,18 +724,21 @@ Player::Player(Model_Textured model, glm::vec3 position, float rotX, float rotY,
 
 void Player::move(uint64_t Frame_Time)
 {
-	increase_Rotation(0, m_Current_Turn_Speed / Frame_Time, 0);
+	increase_Rotation(0.0f, m_Current_Turn_Speed / Frame_Time, 0.0f);
 	float distance = m_Current_Speed / Frame_Time;
 	float dx = distance * glm::sin(get_Rot_Y());
 	float dz = distance * glm::cos(get_Rot_Y());
-	increase_Position(dx, 0, dz);
+	increase_Position(dx, 0.0f, dz);
 
-	m_UpwardSpeed += m_Gravity / Frame_Time;
-	increase_Position(0, m_UpwardSpeed / Frame_Time, 0);
-	//Terrain "Collision"
-	if (get_Position_Y() < 0)
+	if (is_In_Air == true)
 	{
-		m_UpwardSpeed = 0;
+		m_UpwardSpeed += m_Gravity / Frame_Time;
+		increase_Position(0, m_UpwardSpeed / Frame_Time, 0);
+	}
+	//Terrain "Collision"
+	if (get_Position_Y() < 0.0f)
+	{
+		m_UpwardSpeed = 0.0f;
 		is_In_Air = false;
 	}
 }

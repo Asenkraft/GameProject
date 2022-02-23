@@ -65,6 +65,7 @@ uint32_t Importer::importTexture(const std::string& filePath)
 		std::cout << "loaded Texture at :" << filePath << "\n";
 		glGenTextures(1, &texture_ID);
 		glBindTexture(GL_TEXTURE_2D, texture_ID);
+		
 		if (nrChannels == 3)
 		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -73,7 +74,6 @@ uint32_t Importer::importTexture(const std::string& filePath)
 		{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		}
-		
 		glGenerateMipmap(GL_TEXTURE_2D);
 		std::cout << "Texture imported.\n";
 		return texture_ID;

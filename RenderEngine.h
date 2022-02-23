@@ -83,8 +83,8 @@ private:
 
 	Entity_Renderer m_Entity_Renderer;
 	Terrain_Renderer m_Terrain_Renderer;
-
 public:
+	
 	static void enable_Culling();
 	static void disable_Culling();
 	void cleanUp();
@@ -92,6 +92,7 @@ public:
 	void processEntity(Entity& entity);
 	void processTerrain(Terrain& terrain);
 	void prepare();
+	void toggle_Wireframe(bool isPressed);
 	Master_Renderer();
 };
 

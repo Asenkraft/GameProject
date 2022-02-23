@@ -23,6 +23,7 @@ private:
 
 // TODO: change display manager manager width, height on callback
 void scroll_callback(GLFWwindow* window, double xpos, double ypos);
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(Camera& camera, Player& player);
+void processInput(Camera& camera, Player& player, Master_Renderer& renderer);
 

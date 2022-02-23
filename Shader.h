@@ -24,15 +24,7 @@ private:
 class Camera
 {
 public:
-	void move();
-	//move forward (w) or up (shift+w)
-	void keyPressW(bool isShiftPressed);
-	//move backward (s) or down (shift+s)
-	void keyPressS(bool isShiftPressed);
-	//move left
-	void keyPressA();
-	//move right
-	void keyPressD();
+	void move(Player& player);
 	//roll left
 	void keyPressQ();
 	//roll right
@@ -45,21 +37,38 @@ public:
 	void keyPressT();
 	//height down
 	void keyPressG();
+	//move camera towards the player
+	void mousewheelUp();
+	//move camera away from player
+	void mousewheelDown();
+	//move mouse
+	void mouse_movement(double xpos, double ypos);
+
 
 public:
 	glm::vec3 getPosition();
 	float getPitch();
 	float getYaw();
 	float getRoll();
-	Camera();
+	Camera(Player& player);
 private:
-	float m_Distance_From_Player = 50;
-	float m_Angle_Around_Player = 0;
-	void calculate_Zoom();
+	Player m_Player;
+	float m_Distance_From_Player = 5.0f;
+	float m_Angle_Around_Player = 0.0f;
+	double m_xpos = 0.0;
+	double m_ypos = 0.0;
 
+	void calculate_Zoom(float distance);
+	void calculate_Pitch(double distance);
+	void calculate_Angle_Around_Player(double distance);
 
+	float calculateHorizontalDistance();
+	float calculateVerticalDistance();
+
+	void calculateCameraPosition(float horizontalDistance, float verticalDistance);
 
 	glm::vec3 m_position = glm::vec3(1.0f);
+
 	//height of camera
 	float m_pitch = 0.0f;
 	//left/right position of camera
@@ -78,7 +87,7 @@ class MatrixMath
 {
 public:
 	glm::mat4 create_Transformation_Matrix(glm::vec3 translation, float rot_X, float rot_Y, float rot_Z, float scale);
-	glm::mat4 create_View_Matrix(Camera camera);
+	glm::mat4 create_View_Matrix(Camera& camera);
 };
 
 //abstract superclass for Shaders

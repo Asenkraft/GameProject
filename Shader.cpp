@@ -3,45 +3,37 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm/gtc/type_ptr.hpp>
 
-void Camera::move()
+void Camera::move(Player& player)
 {
-}
-
-void Camera::keyPressW(bool isShiftPressed)
-{
-	if (isShiftPressed)
+	//update player
+	m_Player = player;
+	
+	float horizontalDistance = calculateHorizontalDistance();
+	float verticalDistance = calculateVerticalDistance();
+	calculateCameraPosition(horizontalDistance, verticalDistance);
+	m_yaw = 180 - (m_Player.get_Rot_Y() + m_Angle_Around_Player);
+	if (m_pitch > 80.0f)
 	{
-		m_position.y += m_movement_speed;
+		m_pitch = 80.0f;
 	}
-	else
+	else if (m_pitch < -10.0f)
 	{
-		m_position.z -= m_movement_speed;
+		if (m_Distance_From_Player > 2.0)
+		{ 
+			if (m_Distance_From_Player < 2.0)
+			{
+				m_Distance_From_Player = 2.0f;
+			}
+			m_Distance_From_Player = m_Distance_From_Player - 0.01f;
+		}
+
+		if (m_pitch < -60.0f)
+		{
+			m_pitch = -60.0f;
+		}
 	}
 	
 }
-
-void Camera::keyPressS(bool isShiftPressed)
-{
-	if (isShiftPressed)
-	{
-		m_position.y -= m_movement_speed;
-	}
-	else
-	{
-		m_position.z += m_movement_speed;
-	}
-}
-
-void Camera::keyPressA()
-{
-	m_position.x -= m_movement_speed;
-}
-
-void Camera::keyPressD()
-{
-	m_position.x += m_movement_speed;
-}
-
 void Camera::keyPressQ()
 {
 	m_roll += m_movement_speed*10;
@@ -72,6 +64,28 @@ void Camera::keyPressG()
 	m_pitch -= m_movement_speed * 10;
 }
 
+void Camera::mousewheelUp()
+{
+	calculate_Zoom(-1.0f);
+}
+
+void Camera::mousewheelDown()
+{
+	calculate_Zoom(1.0f);
+}
+
+void Camera::mouse_movement(double xpos, double ypos)
+{
+	double distance_x = m_xpos - xpos;
+	double distance_y = m_ypos - ypos;
+
+	calculate_Pitch(distance_y * 0.03);
+	calculate_Angle_Around_Player(distance_x * 0.03);
+
+	m_xpos = xpos;
+	m_ypos = ypos;
+}
+
 glm::vec3 Camera::getPosition()
 {
 	return m_position;
@@ -92,15 +106,63 @@ float Camera::getRoll()
 	return m_roll;
 }
 
-Camera::Camera()
+Camera::Camera(Player& player)
+	:m_Player(player)
 {
 }
 
-void Camera::calculate_Zoom()
+void Camera::calculate_Zoom(float distance)
 {
-
+	if (m_Distance_From_Player > 0.0f)
+	{
+		m_Distance_From_Player += distance;
+	}
+	else if (m_Distance_From_Player <= 0.0f && distance > 0.0f)
+	{
+		m_Distance_From_Player += distance;
+	}
+	
 }
 
+void Camera::calculate_Pitch(double distance)
+{
+	m_pitch += distance;
+}
+
+void Camera::calculate_Angle_Around_Player(double distance)
+{
+	m_Angle_Around_Player -= distance;
+}
+
+float Camera::calculateHorizontalDistance()
+{
+	
+	return (float) (m_Distance_From_Player * glm::cos(glm::radians(m_pitch)));
+}
+
+float Camera::calculateVerticalDistance()
+{
+	return (float)(m_Distance_From_Player * glm::sin(glm::radians(m_pitch)));
+}
+
+void Camera::calculateCameraPosition(float horizontalDistance, float verticalDistance)
+{
+	float offsetX, offsetZ;
+	//x offset
+	float theta = m_Player.get_Position_Y() + m_Angle_Around_Player;
+
+	offsetX = horizontalDistance * glm::sin(glm::radians(theta));
+	//z offset
+	offsetZ = horizontalDistance * glm::cos(glm::radians(theta));
+
+	//+1,5 to aim camera at head
+	m_position.y = m_Player.get_Position().y + verticalDistance +1.5f;
+	//zoom towards player
+	m_position.x = m_Player.get_Position().x - offsetX;
+	//move left/right
+	m_position.z = m_Player.get_Position().z - offsetZ;
+
+}
 
 glm::mat4 MatrixMath::create_Transformation_Matrix(glm::vec3 translation, float rot_X, float rot_Y, float rot_Z, float scale)
 {
@@ -117,7 +179,7 @@ glm::mat4 MatrixMath::create_Transformation_Matrix(glm::vec3 translation, float 
 	return matrix;
 }
 
-glm::mat4 MatrixMath::create_View_Matrix(Camera camera)
+glm::mat4 MatrixMath::create_View_Matrix(Camera& camera)
 {
 	glm::mat4 viewMatrix(1.0f);
 	// height of camera

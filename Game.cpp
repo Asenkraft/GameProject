@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Camera camera;
+
 
 void GameLoop::start()
 {
@@ -39,7 +39,6 @@ void GameLoop::start()
 	Model_Raw raw_Model_Stall = object_importer.load_Object_Model("res/Stall/stall.obj");
 	Texture textured_Stall(loader.load_Texture("res/Stall/stallTexture.png"));
 
-
 	texture_Dragon.set_Shine_Damper(10);
 	texture_Dragon.set_Reflectivity(1);
 
@@ -58,20 +57,15 @@ void GameLoop::start()
 	Model_Textured textured_Model_Fern(raw_Model_Fern, textured_Fern);
 	Model_Textured textured_Model_Stall(raw_Model_Stall, textured_Stall);
 	Model_Textured textured_Model_Gras_Block(raw_Model_Block, basic_Gras_Block_Texture);
-
-	
 	
 	Entity entity_Dragon1(textured_Model_Dragon, glm::vec3(0.0f, 0.0f, -55.0f), 0.0f, 0.0f, 0.0f, 1.0f);
 	Entity entity_Dragon2(textured_Model_Dragon, glm::vec3(0.0f, 0.0f, -35.0f), 0.0f, 0.0f, 0.0f, 1.0f);
 	Entity entity_cube1(textured_Model_Cube, glm::vec3(0.0f, 0.0f, -25.0f), 0.0f, 0.0f, 0.0f, 1.0f);
 	Entity entity_Stall(textured_Model_Stall, glm::vec3(10.0f, 0.0f, -15.0f), 0.0f, 0.0f, 0.0f, 1.0f);
 
-	Entity entity_Gras_Cube1(textured_Model_Gras_Block, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, 0.0f, 0.0f, 1.0f);
-	Entity entity_Gras_Cube2(textured_Model_Gras_Block, glm::vec3(-0.2f, 0.0f, 0.0f), 0.0f, 0.0f, 0.0f, 1.0f);
-	Entity entity_Gras_Cube3(textured_Model_Gras_Block, glm::vec3(0.0f, 0.0f, -0.2f), 0.0f, 0.0f, 0.0f, 1.0f);
-	Entity entity_Gras_Cube4(textured_Model_Gras_Block, glm::vec3(-0.2f, 0.0f, -0.2f), 0.0f, 0.0f, 0.0f, 1.0f);
-	Entity entity_Gras_Cube5(textured_Model_Gras_Block, glm::vec3(0.0f, 0.0f, -0.2f), 0.0f, 0.0f, 0.0f, 1.0f);
-	Entity entity_Gras_Cube6(textured_Model_Gras_Block, glm::vec3(0.2f, 0.0f, -0.2f), 0.0f, 0.0f, 0.0f, 1.0f);
+	Entity entity_Gras_Cube1(textured_Model_Gras_Block, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, 0.0f, 0.0f, 5.0f);
+	Entity entity_Gras_Cube2(textured_Model_Gras_Block, glm::vec3(1.0f, 0.0f, 0.0f), 0.0f, 0.0f, 0.0f, 5.0f);
+
 	Entity entity_Fern1(textured_Model_Fern, glm::vec3(0.0f, 0.2f, 2.4f), 0.0f, 0.0f, 0.0f, 0.2f);
 
 	Terrain terrain = Terrain(0, -1, loader, Texture(loader.load_Texture("res/Terrain/grass.png")));
@@ -80,55 +74,58 @@ void GameLoop::start()
 	Terrain terrain4 = Terrain(0, 0, loader, Texture(loader.load_Texture("res/Terrain/grass2.png")));
 
 	Light light(glm::vec3(0.0f, 500.0f, -20.0f), glm::vec3(1.0f, 1.0f, 1.0f));
-	Player player(textured_Model_Girl, glm::vec3(0.0f, 0.0f, -15.0f), 0.0f, 2.0f, 0.0f, 1.0f);
-	
+	Player player(textured_Model_Girl, glm::vec3(0.0f, 0.0f, 0.0f), 0.0f, 0.0f, 0.0f, 1.0f);
+	Camera camera(player);
 
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	if (glfwRawMouseMotionSupported())
+		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+
+	glfwSetWindowUserPointer(window, &camera);
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	//glfwSetScrollCallback(window, scroll_callback);
+	glfwSetScrollCallback(window, scroll_callback);
+	glfwSetCursorPosCallback(window, cursor_position_callback);
 
 	Master_Renderer renderer;
+
+
 
 	while (!glfwWindowShouldClose(window))
 	{
 		Timer timer;
 
+
 		renderer.processTerrain(terrain);
 		renderer.processTerrain(terrain2);
 		renderer.processTerrain(terrain3);
 		renderer.processTerrain(terrain4);
+
 		renderer.processEntity(entity_Dragon1);
 		renderer.processEntity(entity_Dragon2);
 		renderer.processEntity(entity_cube1);
 		renderer.processEntity(entity_Fern1);
 		renderer.processEntity(entity_Stall);
 
-	
-
 		renderer.processEntity(entity_Gras_Cube1);
 		renderer.processEntity(entity_Gras_Cube2);
-		renderer.processEntity(entity_Gras_Cube3);
-		renderer.processEntity(entity_Gras_Cube4);
-		renderer.processEntity(entity_Gras_Cube5);
-		renderer.processEntity(entity_Gras_Cube6);
-		
 
 		renderer.render(light, camera);
 
 		entity_Dragon1.increase_Rotation(0.0f, 0.0002f, 0.0f);
 		entity_Dragon2.increase_Rotation(0.0f, 0.0002f, 0.0f);
-		entity_cube1.increase_Rotation(0.0f, 0.0002f, 0.0f);
+
 		
-		processInput(camera, player);
+		processInput(camera, player, renderer);
 
 		m_UPS++;
 		m_time_Accumulated += timer.measureTime();
 		m_time_Accumulated_To_One_Seconds += timer.measureTime();
 
-	
-
-
+		
 		player.move(timer.measureTime());
 		renderer.processEntity(player);
+		camera.move(player);
+		
 
 		if (m_time_Accumulated_To_One_Seconds >= 1000000)
 		{
@@ -143,7 +140,7 @@ void GameLoop::start()
 			m_FPS++;
 
 
-
+			
 			DP.updateDisplay(window);
 		}
 		timer.~Timer();
@@ -167,7 +164,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 std:printf("Viewport is changed: width: %i height: %i\r", width, height);
 }
 
-void processInput(Camera& camera, Player& player)
+void processInput(Camera& camera, Player& player, Master_Renderer& renderer)
 {
 
 // TODO: KeyCallback
@@ -177,45 +174,6 @@ void processInput(Camera& camera, Player& player)
 	{
 		std::cout << "\n\nEscape pressed. Window will be closed...\n";
 		glfwSetWindowShouldClose(window, true);
-	}
-
-	//W
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		{
-			camera.keyPressW(true);
-		}
-		else
-		{
-			camera.keyPressW(false);
-		}
-		
-	}
-
-	//A
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		camera.keyPressA();
-	}
-
-	//S
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		{
-			camera.keyPressS(true);
-		}
-		else
-		{
-			camera.keyPressS(false);
-		}
-	}
-
-	//D
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		camera.keyPressD();
 	}
 
 	//Q
@@ -256,12 +214,13 @@ void processInput(Camera& camera, Player& player)
 
 
 	//Arrow Up
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		player.move_UP(true);
 	}
+
 	//Arrow Down
-	else  if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	else  if (glfwGetKey(window, GLFW_KEY_DOWN) || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		player.move_Down(true);
 
@@ -269,25 +228,45 @@ void processInput(Camera& camera, Player& player)
 	else player.move_Down(false);
 
 	//Arrow Left
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		player.move_Left(true);
 	}
+
 	//Arrow Right
-	else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	else if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		player.move_Right(true);
 	}
 	else player.move_Right(false);
+
 	//Space
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 	{
 		player.move_Jump(true);
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
+	{
+		renderer.toggle_Wireframe(true);
+	}
+	else
+	{
+		renderer.toggle_Wireframe(false);
+	}
 }
 
 void scroll_callback(GLFWwindow* window, double xpos, double ypos)
 {
-	std::cout << "ypos: " << ypos << "\n";
+	glfwGetWindowUserPointer(window);
+	Camera* camera = (Camera*)glfwGetWindowUserPointer(window);
+	ypos > 0 ? camera->mousewheelUp() : camera->mousewheelDown();
+}
+
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	glfwGetWindowUserPointer(window);
+	Camera* camera = (Camera*)glfwGetWindowUserPointer(window);
+
+	camera->mouse_movement(-xpos, -ypos);
 }
